@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShopIt - Shopping Cart</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Top banner for promotions -->
+  <div class="promo-banner">
+    FREE SHIPPING OVER $100/€78 *TAXES AND DUTIES STILL APPLY
+    <span class="shop-now">Shop Now</span>
+  </div>
+
+  <!-- Navigation header -->
+  <header>
+    <nav class="navbar">
+      <div class="nav-left">
+        <span>Shop</span>
+        <span>About</span>
+        <span>More</span>
+      </div>
+      <div class="brand">SHOPIT</div>
+      <div class="nav-right">
+        <span>🔍 Search</span>
+        <span>Account</span>
+        <span class="bag-icon">Bag <span id="cart-count">0</span></span>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Breadcrumb navigation -->
+  <div class="breadcrumb">
+    <span>Home / Bag</span>
+  </div>
+
+  <!-- Main cart section -->
+  <main>
+    <section class="cart-section">
+      <h1>Your Bag</h1>
+
+      <!-- Cart items container -->
+      <div class="cart-container">
+        <div class="cart-table-header">
+          <span>Product</span>
+          <span>Price</span>
+          <span>Quantity</span>
+          <span>Total</span>
+        </div>
+        <div id="cart-list"></div>
+      </div>
+
+      <!-- Add custom item form -->
+      <div class="custom-item-section">
+        <h3>Add Custom Item</h3>
+        <div class="custom-form">
+          <input type="text" id="custom-name" placeholder="Item name" class="form-input" />
+          <input type="number" id="custom-price" placeholder="Price" min="0" step="0.01" class="form-input" />
+          <input type="file" id="custom-image" accept="image/*" class="form-input"/>
+          <button id="add-custom" class="btn-secondary">Add to Cart</button>
+        </div>
+      </div>
+
+      <!-- Delivery and payment info sidebar -->
+      <div class="info-panel">
+        <div class="delivery-info">
+          <h4>Delivery Info</h4>
+          <p>See our delivery & returns info here</p>
+        </div>
+        <div class="payment-info">
+          <h4>Payment Info</h4>
+          <p>We accept the following methods of payment</p>
+          <div class="payment-methods">
+            <span>💳 VISA</span>
+            <span>💳 Mastercard</span>
+            <span>💳 Amex</span>
+            <span>💳 GPay</span>
+            <span>💳 Apple Pay</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order summary and checkout -->
+      <div class="checkout-section">
+        <div class="totals">
+          <div class="subtotal-row">
+            <span>SUBTOTAL</span>
+            <span>$<span id="subtotal">0.00</span></span>
+          </div>
+          <div class="tax-row">
+            <span>TAX (8%)</span>
+            <span>$<span id="tax">0.00</span></span>
+          </div>
+          <div id="total-row" class="total-row">
+            <span>TOTAL</span>
+            <span>$<span id="total">0.00</span></span>
+          </div>
+          <p class="tax-note">Taxes and shipping calculated at checkout</p>
+        </div>
+
+        <div class="promo-section">
+          <input type="text" id="promo" placeholder="Add promo code" class="promo-input"/>
+          <button id="apply-promo" class="btn-apply">→</button>
+        </div>
+
+        <div class="button-row">
+          <button id="update-cart" class="btn-update">UPDATE</button>
+          <button id="reset-cart" class="btn-reset">RESET CART</button>
+        </div>
+        <button id="checkout" class="btn-checkout">CHECKOUT</button>
+        
+        <div class="alt-payment-buttons">
+          <button class="shop-pay-btn">Shop Pay</button>
+          <button class="gpay-btn">G Pay</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 ShopIt. All rights reserved.</p>
+  </footer>
+
+  <script src="shopit.js"></script>
+</body>
+</html>
