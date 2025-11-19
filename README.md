@@ -1,154 +1,238 @@
-# ShopIt Shopping Cart - Complete Setup Guide
+# ShopIt - Shopping Cart System 🛒
 
-## 🎯 Features
+[![Java](https://img.shields.io/badge/Java-8+-orange.svg)](https://www.oracle.com/java/)
+[![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-yellow.svg)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-✅ **Toast Notifications** - No alert() popups, elegant slide-in notifications  
-✅ **Discount Breakdown** - Shows original price (strikethrough), discount amount, and final price  
-✅ **Auto-Clear Discount** - Discount removes automatically when cart is empty  
-✅ **Reset Cart Button** - Clear entire cart with confirmation dialog  
-✅ **Custom Promo Codes** - Easy to add your own codes in JavaScript  
-✅ **JDBC Backend** - SQLite database with JDBC for order persistence  
-✅ **localStorage** - Cart persists across browser sessions  
-✅ **Image Upload** - Add custom items with optional images  
+> An intermediate-level shopping cart system demonstrating **JavaScript closures**, **callbacks**, and **JDBC** integration for database persistence.
+
+![ShopIt Demo](https://via.placeholder.com/800x400/f5f5f5/333?text=ShopIt+Shopping+Cart)
 
 ---
 
-## 📁 Complete File List
+## 📋 Table of Contents
 
-shopit/
-├── index.html           ← Complete HTML with Reset Cart button
-├── styles.css           ← Complete CSS with notification styles
-├── shopit.js            ← Complete JavaScript with all features
-├── ShopItServer.java    ← Java JDBC backend
-└── README.md            ← This file
-```
-
----
-
-## 🚀 Quick Start
-
-### Step 1: Start Backend
-
-```powershell
-cd C:\Users\Administrator\Desktop\web-tech-worklshop\Final_project\shopit
-
-# Compile Java (if not already compiled)
-javac ShopItServer.java
-
-# Run with JDBC driver (as you have it working)
-java -cp ".;sqlite-jdbc-3.42.0.0.jar" ShopItServer
-```
-
-You should see:
-```
-=== ShopIt Server Starting ===
-✓ SQLite JDBC Driver loaded successfully
-✓ Database initialized successfully
-✓ ShopIt JDBC Server started on http://localhost:8080
-✓ Database: shopit.db
-```
-
-### Step 2: Start Frontend
-
-Open **NEW PowerShell window**:
-
-```powershell
-cd C:\Users\Administrator\Desktop\web-tech-worklshop\Final_project\shopit
-
-# Option 1: Python HTTP server
-python -m http.server 8000
-
-# Option 2: VS Code Live Server
-# Right-click index.html → "Open with Live Server"
-```
-
-### Step 3: Open in Browser
-
-Navigate to: **http://localhost:8000**
+- [Features](#-features)
+- [Demo](#-demo)
+- [Technologies](#-technologies)
+- [Getting Started](#-getting-started)
+- [Project Structure](#-project-structure)
+- [Usage](#-usage)
+- [Promo Codes](#-promo-codes)
+- [Customization](#-customization)
+- [JavaScript Concepts](#-javascript-concepts)
+- [API Documentation](#-api-documentation)
+- [Contributing](#-contributing)
+- [License](#-license)
+- [Author](#-author)
 
 ---
 
-## ✨ Test All Features
+## ✨ Features
 
-### 1. Toast Notifications
+### Core Functionality
+- 🛍️ **Add/Remove Items** - Dynamic cart management with quantity controls
+- 💰 **Promo Code System** - Automatic discount calculation with 8+ built-in codes
+- 💾 **Persistent Storage** - Cart data saved using localStorage
+- 🖼️ **Image Upload** - Custom items with optional product images
+- 📊 **Discount Breakdown** - Visual display of original price, discount, and final total
 
-- **Add item** → Green success toast slides in from right ✓
-- **Remove item** → Blue info toast ✓
-- **Apply invalid promo** → Red error toast ✓
-- **All toasts auto-hide after 4 seconds**
-- **Click × to close manually**
+### User Experience
+- 🔔 **Toast Notifications** - Non-intrusive slide-in alerts (no popups!)
+- 🔄 **Auto-Clear Discount** - Discount removes when cart is emptied
+- 🗑️ **Reset Cart** - One-click cart clearing with confirmation
+- 📱 **Responsive Design** - Mobile-friendly interface
 
-### 2. Discount Breakdown
+### Backend
+- 🗄️ **JDBC Integration** - SQLite database for order persistence
+- 🔌 **REST API** - Simple HTTP endpoints for checkout and order retrieval
+- 💼 **No External Dependencies** - Pure Java with built-in HTTP server
 
-1. Add items to cart
-2. Apply promo code "SAVE20"
-3. See in totals section:
-   - **Subtotal**: $X.XX
-   - **Tax (8%)**: $X.XX
-   - **Discount (SAVE20)**: -$X.XX ← New row in red
-   - **Total**: ~~$X.XX~~ $X.XX ← Original strikethrough, final price
+---
 
-### 3. Auto-Clear Discount
+## 🎬 Demo
 
-1. Apply any promo code
-2. Remove all items one by one
-3. When last item removed:
-   - Toast: "Cart is now empty. Discount removed." ✓
-   - Discount row disappears ✓
+### Screenshot
+![Cart Interface](https://via.placeholder.com/600x400/fff/333?text=Cart+Screenshot)
 
-### 4. Reset Cart Button
+### Live Demo
+*(Add your deployed link here if available)*
 
-1. Add multiple items
-2. Apply promo code
-3. Click **"RESET CART"** button
-4. Confirmation dialog appears
-5. Click OK → Everything clears ✓
-6. Toast: "Cart has been reset" ✓
+---
 
-### 5. Checkout with JDBC
+## 🛠️ Technologies
 
-1. Add items to cart
-2. Apply promo code (optional)
-3. Click **"CHECKOUT"**
-4. Toast: "Processing order..." then "Order confirmed! Order ID: 1" ✓
-5. Check backend console: "✓ Order 1 saved successfully" ✓
-6. Check database:
-   ```powershell
-   sqlite3 shopit.db "SELECT * FROM orders;"
+### Frontend
+- **HTML5** - Semantic markup
+- **CSS3** - Grid, Flexbox, Animations
+- **JavaScript (ES6+)** - Vanilla JS with modern features
+  - Closures for data encapsulation
+  - Callbacks for async operations
+  - Template literals
+  - Array methods (map, reduce, filter)
+
+### Backend
+- **Java 8+** - Core backend logic
+- **JDBC** - Database connectivity
+- **SQLite** - Lightweight embedded database
+- **HttpServer** - Built-in Java HTTP server
+
+### Storage
+- **localStorage** - Client-side cart persistence
+- **SQLite Database** - Server-side order storage
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+Ensure you have the following installed:
+
+```bash
+# Check Java version (8 or higher required)
+java -version
+
+# Check Python version (for frontend server)
+python --version
+
+# Check Git
+git --version
+```
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/srisuahs/shopit-cart.git
+   cd shopit-cart
+   ```
+
+2. **Download SQLite JDBC Driver**
+   ```bash
+   # Download from Maven Central
+   curl -O https://repo1.maven.org/maven2/org/xerial/sqlite-jdbc/3.42.0.0/sqlite-jdbc-3.42.0.0.jar
+   ```
+   
+   Or download manually from: [SQLite JDBC](https://github.com/xerial/sqlite-jdbc/releases)
+
+3. **Compile Java Backend**
+   ```bash
+   javac ShopItServer.java
+   ```
+
+4. **Start Backend Server**
+   ```bash
+   # Windows
+   java -cp ".;sqlite-jdbc-3.42.0.0.jar" ShopItServer
+   
+   # macOS/Linux
+   java -cp ".:sqlite-jdbc-3.42.0.0.jar" ShopItServer
+   ```
+   
+   Backend runs on `http://localhost:8080`
+
+5. **Start Frontend Server**
+   
+   Open a new terminal:
+   ```bash
+   # Using Python
+   python -m http.server 8000
+   
+   # Or using Node.js
+   npx http-server -p 8000
+   ```
+   
+   Or use VS Code **Live Server** extension
+
+6. **Open in Browser**
+   ```
+   http://localhost:8000
    ```
 
 ---
 
-## 💳 Built-in Promo Codes
+## 📁 Project Structure
 
-Test these codes:
-
-| Code | Discount | Description |
-|------|----------|-------------|
-| `SAVE10` | 10% off | Standard discount |
-| `SAVE20` | 20% off | Better discount |
-| `WELCOME` | 15% off | New customer offer |
-| `STUDENT` | 25% off | Student discount |
-| `FREESHIP` | 5% off | Free shipping |
-| `BLACKFRIDAY` | 30% off | Black Friday sale |
-| `VIP` | 40% off | VIP members |
-| `FIRST50` | 50% off | First purchase |
+```
+shopit-cart/
+├── index.html              # Main HTML structure
+├── styles.css              # Complete styling with animations
+├── shopit.js               # Frontend logic (closures, callbacks)
+├── ShopItServer.java       # Java backend with JDBC
+├── sqlite-jdbc-3.45.0.0.jar # JDBC driver (download separately)
+├── shopit.db               # SQLite database (auto-created)
+├── README.md               # This file
+└── LICENSE                 # MIT License
+```
 
 ---
 
-## 🎨 Adding Your Own Promo Codes
+## 📖 Usage
 
-Open `shopit.js`, find line ~270:
+### Adding Items to Cart
+
+1. **Pre-loaded Items**: Sample items load automatically on first visit
+2. **Custom Items**:
+   - Enter item name
+   - Enter price
+   - (Optional) Upload product image
+   - Click "Add to Cart"
+
+### Applying Discounts
+
+1. Add items to cart
+2. Enter promo code in the field
+3. Click the **→** button
+4. View discount breakdown in totals section
+
+### Checkout
+
+1. Review cart items and total
+2. Click **"CHECKOUT"** button
+3. Order saves to database
+4. Cart clears automatically
+5. Confirmation notification appears
+
+### Managing Cart
+
+- **Increase/Decrease Quantity**: Use **+/-** buttons
+- **Remove Item**: Click "Remove" button
+- **Update Cart**: Click "UPDATE" to save changes
+- **Reset Cart**: Click "RESET CART" to clear everything
+
+---
+
+## 💳 Promo Codes
+
+Test the discount system with these built-in codes:
+
+| Code | Discount | Description |
+|------|----------|-------------|
+| `SAVE10` | 10% | Standard discount |
+| `SAVE20` | 20% | Better discount |
+| `WELCOME` | 15% | New customer offer |
+| `STUDENT` | 25% | Student discount |
+| `FREESHIP` | 5% | Free shipping |
+| `BLACKFRIDAY` | 30% | Black Friday sale |
+| `VIP` | 40% | VIP member discount |
+| `FIRST50` | 50% | First purchase special |
+
+---
+
+## 🎨 Customization
+
+### Adding Your Own Promo Codes
+
+Edit `shopit.js` around line 270:
 
 ```javascript
 const promoCodes = {
   'SAVE10': { discount: 0.10, description: '10% off' },
-  'SAVE20': { discount: 0.20, description: '20% off' },
   
-  // ADD YOUR CUSTOM CODES HERE:
-  'MYCODE': { discount: 0.35, description: 'My special 35% off' },
-  'HOLIDAY': { discount: 0.40, description: 'Holiday sale' },
-  'CLEARANCE': { discount: 0.60, description: 'Clearance 60% off' }
+  // Add your custom codes here:
+  'MYCODE': { discount: 0.35, description: 'My custom 35% off' },
+  'HOLIDAY': { discount: 0.40, description: 'Holiday special' }
 };
 ```
 
@@ -158,101 +242,44 @@ const promoCodes = {
 - `0.50` = 50% off
 - `1.00` = 100% off (free!)
 
-Save the file and refresh your browser!
+### Changing Tax Rate
 
----
+Edit `shopit.js` around line 85:
 
-## 🗄️ Database Structure
-
-The SQLite database has this structure:
-
-```sql
-CREATE TABLE orders (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  order_data TEXT NOT NULL,           -- Full JSON of cart items
-  total_amount REAL NOT NULL,          -- Final total after discount
-  promo_code TEXT,                     -- Applied promo code (if any)
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+```javascript
+const tax = subtotal * 0.08; // Change 0.08 to your tax rate
 ```
 
-View orders:
-```powershell
-# View all orders
-sqlite3 shopit.db "SELECT id, total_amount, promo_code, created_at FROM orders;"
+### Styling Modifications
 
-# Count orders
-sqlite3 shopit.db "SELECT COUNT(*) FROM orders;"
-
-# View recent orders
-sqlite3 shopit.db "SELECT * FROM orders ORDER BY created_at DESC LIMIT 5;"
-```
+Edit `styles.css` to customize:
+- Colors
+- Fonts
+- Button styles
+- Layout spacing
+- Animations
 
 ---
 
-## 🧪 Complete Test Scenario
+## 💡 JavaScript Concepts
 
-### Scenario: Full Purchase Flow with Discount
+This project demonstrates key JavaScript patterns:
 
-1. **Start both servers** (backend + frontend)
-2. **Add custom item:**
-   - Name: "Laptop"
-   - Price: 1000
-   - Upload image (optional)
-   - Click "Add to Cart"
-   - See: Green toast "Laptop added to cart!"
+### Closures for Data Encapsulation
 
-3. **Add another item:**
-   - Name: "Mouse"
-   - Price: 25
-   - Click "Add to Cart"
-
-4. **Check totals:**
-   - Subtotal: $1025.00
-   - Tax (8%): $82.00
-   - Total: $1107.00
-
-5. **Apply promo code:**
-   - Enter: "SAVE20"
-   - Click → button
-   - See: Green toast "Promo code applied! 20% off - You save 20%"
-
-6. **Check discount breakdown:**
-   - Subtotal: $1025.00
-   - Tax (8%): $82.00
-   - Discount (SAVE20): -$221.40
-   - Total: ~~$1107.00~~ **$885.60**
-
-7. **Checkout:**
-   - Click "CHECKOUT"
-   - Toast: "Processing order..."
-   - Toast: "Order confirmed! Order ID: 1. Total: $885.60"
-   - Backend console: "✓ Order 1 saved successfully (Total: $885.6)"
-   - Cart clears automatically
-
-8. **Verify in database:**
-   ```powershell
-   sqlite3 shopit.db "SELECT * FROM orders WHERE id=1;"
-   ```
-
----
-
-## 🎯 JavaScript Concepts Demonstrated
-
-### Closures
 ```javascript
 function createCart() {
   let items = [];  // Private variable
-  let promoCode = null;  // Private variable
   
   return {
-    getItems: () => [...items],  // Closure accessing private items
-    addItem: (name, price) => { items.push(...); }  // Closure modifying items
+    getItems: () => [...items],  // Closure accessing private data
+    addItem: (item) => { items.push(item); }
   };
 }
 ```
 
-### Callbacks
+### Callbacks for Async Operations
+
 ```javascript
 // FileReader callback
 reader.onload = function(e) {
@@ -264,10 +291,146 @@ cart.applyPromo(code, validatePromoCode);
 ```
 
 ### Higher-Order Functions
+
 ```javascript
-items.map(item => `<div>...</div>`)
+items.map(item => `<div>${item.name}</div>`)
 items.reduce((sum, item) => sum + item.price, 0)
+items.filter(item => item.quantity > 0)
 ```
+
+---
+
+## 🔌 API Documentation
+
+### Backend Endpoints
+
+#### POST `/api/checkout`
+Save order to database.
+
+**Request Body:**
+```json
+{
+  "items": [
+    {"id": "xyz", "name": "Product", "price": 25.00, "quantity": 2}
+  ],
+  "totals": {
+    "subtotal": 50.00,
+    "tax": 4.00,
+    "finalTotal": 54.00
+  },
+  "promoCode": "SAVE20",
+  "timestamp": "2025-11-20T03:00:00.000Z"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "orderId": 1,
+  "message": "Order saved successfully"
+}
+```
+
+#### GET `/api/orders`
+Retrieve all orders from database.
+
+**Response:**
+```json
+[
+  {
+    "id": 1,
+    "data": {...},
+    "total": 54.00,
+    "promoCode": "SAVE20",
+    "createdAt": "2025-11-20 03:00:00"
+  }
+]
+```
+
+---
+
+## 🗄️ Database Schema
+
+```sql
+CREATE TABLE orders (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  order_data TEXT NOT NULL,
+  total_amount REAL NOT NULL,
+  promo_code TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+### Viewing Orders
+
+```bash
+# Using SQLite CLI
+sqlite3 shopit.db "SELECT * FROM orders;"
+
+# Count total orders
+sqlite3 shopit.db "SELECT COUNT(*) FROM orders;"
+
+# View recent orders
+sqlite3 shopit.db "SELECT * FROM orders ORDER BY created_at DESC LIMIT 5;"
+```
+
+---
+
+## 🧪 Testing
+
+### Manual Testing Checklist
+
+- [ ] Add custom item with image
+- [ ] Increase/decrease item quantity
+- [ ] Remove individual items
+- [ ] Apply valid promo code
+- [ ] Apply invalid promo code
+- [ ] View discount breakdown
+- [ ] Complete checkout
+- [ ] Reset cart
+- [ ] Verify localStorage persistence (refresh page)
+- [ ] Check database for saved orders
+
+### Test Scenario
+
+1. Add "Laptop" ($1000) and "Mouse" ($25)
+2. Apply "SAVE20" code (20% off)
+3. Expected totals:
+   - Subtotal: $1,025.00
+   - Tax (8%): $82.00
+   - Discount: -$221.40
+   - Final Total: $885.60
+4. Checkout and verify order in database
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Here's how:
+
+1. **Fork the repository**
+2. **Create a feature branch**
+   ```bash
+   git checkout -b feature/amazing-feature
+   ```
+3. **Commit your changes**
+   ```bash
+   git commit -m "Add some amazing feature"
+   ```
+4. **Push to branch**
+   ```bash
+   git push origin feature/amazing-feature
+   ```
+5. **Open a Pull Request**
+
+### Code Style Guidelines
+
+- Use ES6+ JavaScript features
+- Add comments for complex logic
+- Follow existing code formatting
+- Test before submitting PR
+- Update README if adding features
 
 ---
 
@@ -275,131 +438,73 @@ items.reduce((sum, item) => sum + item.price, 0)
 
 ### Backend Issues
 
-**"No suitable driver found"**
-- Make sure `sqlite-jdbc-3.45.0.0.jar` is in your folder
-- Run with: `java -cp ".;sqlite-jdbc-3.45.0.0.jar" ShopItServer`
-- Check Java version: `java -version` (needs 8+)
+**"No suitable driver found for jdbc:sqlite"**
+- Ensure `sqlite-jdbc-3.45.0.0.jar` is in the same directory
+- Check classpath syntax (`;` for Windows, `:` for macOS/Linux)
 
 **"Port 8080 already in use"**
-```powershell
-# Find and kill process
+```bash
+# Windows
 netstat -ano | findstr :8080
 taskkill /PID <PID> /F
+
+# macOS/Linux
+lsof -ti:8080 | xargs kill
 ```
 
 ### Frontend Issues
 
-**Notifications not showing**
-- Check browser console (F12) for errors
-- Make sure `styles.css` includes notification styles
-- Hard refresh: Ctrl+F5
-
-**Discount not showing**
-- Apply a promo code first
-- Make sure items are in cart
-- Check that you're using the new `shopit.js`
-
-**Reset button not working**
-- Check that `index.html` has `<button id="reset-cart">`
+**Toast notifications not showing**
+- Hard refresh browser (Ctrl+F5 / Cmd+Shift+R)
 - Check browser console for errors
-- Verify JavaScript is loading
+- Verify CSS file loaded correctly
+
+**Cart not persisting**
+- Check browser localStorage is enabled
+- Clear site data and try again
 
 ---
 
-## 📦 File Dependencies
+## 📄 License
 
-```
-index.html
-  ├── styles.css  (loads all styles including notifications)
-  └── shopit.js   (loads all JavaScript features)
-
-ShopItServer.java
-  └── sqlite-jdbc-3.45.0.0.jar  (JDBC driver)
-
-shopit.js
-  └── localStorage  (browser storage)
-  └── http://localhost:8080/api/checkout  (backend API)
-
-Backend creates:
-  └── shopit.db  (SQLite database file)
-```
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 🚀 Next Steps
+## 🙏 Acknowledgments
 
-**Enhancements you can add:**
-
-1. **User Authentication**
-   - Login/Register system
-   - User-specific carts
-   - Order history per user
-
-2. **Admin Dashboard**
-   - View all orders
-   - Manage promo codes
-   - Sales analytics
-
-3. **Payment Integration**
-   - Stripe or PayPal
-   - Credit card processing
-   - Receipt generation
-
-4. **Email Notifications**
-   - Order confirmation emails
-   - Shipping updates
-   - Promo code announcements
-
-5. **Advanced Features**
-   - Product categories
-   - Search functionality
-   - Wish list
-   - Product reviews
+- Project created for Web Technology Workshop
+- Inspired by modern e-commerce platforms
+- Built with focus on JavaScript fundamentals
+- No frameworks used - pure vanilla JavaScript
 
 ---
 
-## 📚 Learning Resources
+## 📊 Project Stats
 
-- **Closures**: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures
-- **Callbacks**: https://developer.mozilla.org/en-US/docs/Glossary/Callback_function
-- **JDBC Tutorial**: https://docs.oracle.com/javase/tutorial/jdbc/
-- **SQLite Documentation**: https://www.sqlite.org/docs.html
-
----
-
-## ✅ Success Checklist
-
-- [ ] Backend starts without errors
-- [ ] Frontend loads at http://localhost:8000
-- [ ] No console errors (F12)
-- [ ] Can add custom items
-- [ ] Toast notifications appear
-- [ ] Can apply promo codes
-- [ ] Discount shows breakdown
-- [ ] Reset cart button works
-- [ ] Checkout saves to database
-- [ ] shopit.db file exists
-- [ ] Orders visible in database
+![GitHub stars](https://img.shields.io/github/stars/yourusername/shopit-cart?style=social)
+![GitHub forks](https://img.shields.io/github/forks/yourusername/shopit-cart?style=social)
+![GitHub issues](https://img.shields.io/github/issues/yourusername/shopit-cart)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/yourusername/shopit-cart)
 
 ---
 
-## 🎉 You're Done!
+## 🎯 Future Enhancements
 
-You now have a fully functional shopping cart with:
-- Toast notifications (no popups!)
-- Discount breakdown display
-- Auto-clear discount
-- Reset cart button
-- Custom promo codes
-- JDBC database persistence
-- localStorage cart
-- Image uploads
+- [ ] User authentication system
+- [ ] Payment gateway integration (Stripe/PayPal)
+- [ ] Email order confirmations
+- [ ] Admin dashboard
+- [ ] Product search functionality
+- [ ] Wish list feature
+- [ ] Order history for users
+- [ ] Multiple product categories
+- [ ] Product reviews and ratings
 
-**Everything works together perfectly!**
+---
 
-For questions or issues, check:
-- Browser console (F12)
-- Backend server console
-- Database: `sqlite3 shopit.db "SELECT * FROM orders;"`
+**⭐ Star this repository if you found it helpful!**
 
-Happy coding! 🛒✨
+**🐛 Found a bug? [Open an issue](https://github.com/yourusername/shopit-cart/issues)**
+
+**💬 Have questions? Start a [discussion](https://github.com/yourusername/shopit-cart/discussions)**
