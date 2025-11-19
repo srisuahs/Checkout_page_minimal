@@ -50,16 +50,6 @@
 
 ---
 
-## 🎬 Demo
-
-### Screenshot
-![Cart Interface](https://via.placeholder.com/600x400/fff/333?text=Cart+Screenshot)
-
-### Live Demo
-*(Add your deployed link here if available)*
-
----
-
 ## 🛠️ Technologies
 
 ### Frontend
@@ -477,16 +467,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Inspired by modern e-commerce platforms
 - Built with focus on JavaScript fundamentals
 - No frameworks used - pure vanilla JavaScript
-
----
-
-## 📊 Project Stats
-
-![GitHub stars](https://img.shields.io/github/stars/yourusername/shopit-cart?style=social)
-![GitHub forks](https://img.shields.io/github/forks/yourusername/shopit-cart?style=social)
-![GitHub issues](https://img.shields.io/github/issues/yourusername/shopit-cart)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/yourusername/shopit-cart)
-
 ---
 
 ## 🎯 Future Enhancements
