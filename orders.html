@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Orders - ShopIt</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Top banner -->
+  <div class="promo-banner">
+    FREE SHIPPING OVER $100/€78 *TAXES AND DUTIES STILL APPLY
+    <span class="shop-now">Shop Now</span>
+  </div>
+
+  <!-- Navigation header -->
+  <header>
+    <nav class="navbar">
+      <div class="nav-left">
+        <span>Shop</span>
+        <span>About</span>
+        <span>More</span>
+      </div>
+      <div class="brand" onclick="window.location.href='index.html'" style="cursor: pointer;">SHOPIT</div>
+      <div class="nav-right">
+        <span>🔍 Search</span>
+        <span onclick="window.location.href='orders.html'" style="cursor: pointer;">📦 Orders</span>
+        <span>Account</span>
+        <span class="bag-icon" onclick="window.location.href='index.html'" style="cursor: pointer;">Bag <span id="cart-count">0</span></span>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <span>Home / Orders</span>
+  </div>
+
+  <!-- Main Orders Section -->
+  <main>
+    <section class="cart-section">
+      <h1>My Orders</h1>
+      
+      <!-- Orders will be rendered here -->
+      <div id="orders-list"></div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 ShopIt. All rights reserved.</p>
+  </footer>
+
+  <script src="orders.js"></script>
+</body>
+</html>

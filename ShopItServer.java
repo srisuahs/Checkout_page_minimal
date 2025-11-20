@@ -5,8 +5,7 @@ import java.util.*;
 import com.sun.net.httpserver.*;
 
 /**
- * ShopIt JDBC Backend Server
- * Uses SQLite database with JDBC for cart persistence
+ * ShopIt JDBC Backend Server - WITH CANCEL AND DELETE ENDPOINTS
  */
 public class ShopItServer {
     
@@ -15,13 +14,12 @@ public class ShopItServer {
     public static void main(String[] args) throws Exception {
         System.out.println("=== ShopIt Server Starting ===");
         
-        // Explicitly load SQLite JDBC driver
+        // Load SQLite JDBC driver
         try {
             Class.forName("org.sqlite.JDBC");
             System.out.println("✓ SQLite JDBC Driver loaded successfully");
         } catch (ClassNotFoundException e) {
             System.err.println("✗ ERROR: SQLite JDBC Driver not found!");
-            System.err.println("Make sure sqlite-jdbc-3.45.0.0.jar is in the classpath");
             System.exit(1);
         }
         
@@ -37,37 +35,31 @@ public class ShopItServer {
         
         System.out.println("✓ ShopIt JDBC Server started on http://localhost:8080");
         System.out.println("✓ Database: shopit.db");
+        System.out.println("✓ Endpoints: /api/checkout, /api/orders, /api/orders/{id}/cancel, /api/orders/{id} [DELETE]");
         System.out.println("Press Ctrl+C to stop the server");
         System.out.println("=================================");
     }
     
-    /**
-     * Initialize SQLite database and create orders table
-     */
     private static void initializeDatabase() {
         try (Connection conn = DriverManager.getConnection(DB_URL)) {
-            String createTableSQL = 
-                "CREATE TABLE IF NOT EXISTS orders (" +
+            String sql = "CREATE TABLE IF NOT EXISTS orders (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "order_data TEXT NOT NULL, " +
                 "total_amount REAL NOT NULL, " +
                 "promo_code TEXT, " +
+                "status TEXT DEFAULT 'active', " +
                 "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
             
             try (Statement stmt = conn.createStatement()) {
-                stmt.execute(createTableSQL);
+                stmt.execute(sql);
                 System.out.println("✓ Database initialized successfully");
             }
         } catch (SQLException e) {
-            System.err.println("✗ Database initialization error: " + e.getMessage());
+            System.err.println("✗ Database error: " + e.getMessage());
             e.printStackTrace();
         }
     }
     
-    /**
-     * Handler for checkout API endpoint
-     * POST /api/checkout
-     */
     static class CheckoutHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
@@ -79,107 +71,76 @@ public class ShopItServer {
             }
             
             if (!"POST".equals(exchange.getRequestMethod())) {
-                sendResponse(exchange, 405, "{\"error\": \"Method not allowed\"}");
+                sendResponse(exchange, 405, "{\"error\":\"Method not allowed\"}");
                 return;
             }
             
             try {
-                String requestBody = readRequestBody(exchange);
+                String body = readBody(exchange);
                 System.out.println("Received checkout request");
                 
-                double totalAmount = extractTotalFromJSON(requestBody);
-                String promoCode = extractPromoCodeFromJSON(requestBody);
-                int orderId = saveOrder(requestBody, totalAmount, promoCode);
+                double total = extractTotal(body);
+                String promo = extractPromo(body);
+                int orderId = saveOrder(body, total, promo);
                 
                 String response = String.format(
-                    "{\"success\": true, \"orderId\": %d, \"message\": \"Order saved successfully\"}",
+                    "{\"success\":true,\"orderId\":%d,\"message\":\"Order saved successfully\"}",
                     orderId
                 );
+                
                 sendResponse(exchange, 200, response);
-                System.out.println("✓ Order " + orderId + " saved successfully (Total: $" + totalAmount + ")");
+                System.out.println("✓ Order " + orderId + " saved ($" + total + ")");
                 
             } catch (Exception e) {
                 System.err.println("✗ Checkout error: " + e.getMessage());
                 e.printStackTrace();
-                sendResponse(exchange, 500, "{\"error\": \"Checkout failed\"}");
+                sendResponse(exchange, 500, "{\"error\":\"" + e.getMessage() + "\"}");
             }
         }
         
-        /**
-         * Save order to database using JDBC
-         */
-        private int saveOrder(String orderData, double totalAmount, String promoCode) throws SQLException {
-            String insertSQL = "INSERT INTO orders (order_data, total_amount, promo_code) VALUES (?, ?, ?)";
+        private int saveOrder(String data, double total, String promo) throws SQLException {
+            String sql = "INSERT INTO orders (order_data, total_amount, promo_code, status) VALUES (?, ?, ?, 'active')";
             
             try (Connection conn = DriverManager.getConnection(DB_URL);
-                 PreparedStatement pstmt = conn.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS)) {
+                 PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                 
-                pstmt.setString(1, orderData);
-                pstmt.setDouble(2, totalAmount);
-                pstmt.setString(3, promoCode);
-                pstmt.executeUpdate();
+                ps.setString(1, data);
+                ps.setDouble(2, total);
+                ps.setString(3, promo);
+                ps.executeUpdate();
                 
-                try (ResultSet rs = pstmt.getGeneratedKeys()) {
+                try (ResultSet rs = ps.getGeneratedKeys()) {
                     if (rs.next()) {
                         return rs.getInt(1);
                     }
                 }
-                throw new SQLException("Failed to save order");
             }
+            throw new SQLException("Failed to save order");
         }
         
-        /**
-         * Extract total amount from JSON
-         */
-        private double extractTotalFromJSON(String json) {
+        private double extractTotal(String json) {
             try {
-                // Look for finalTotal first (with discount), then total
-                String finalTotalPattern = "\"finalTotal\"\\s*:\\s*(\\d+\\.?\\d*)";
-                java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(finalTotalPattern);
-                java.util.regex.Matcher matcher = pattern.matcher(json);
+                java.util.regex.Pattern p = java.util.regex.Pattern.compile("\"finalTotal\"\\s*:\\s*(\\d+\\.?\\d*)");
+                java.util.regex.Matcher m = p.matcher(json);
+                if (m.find()) return Double.parseDouble(m.group(1));
                 
-                if (matcher.find()) {
-                    return Double.parseDouble(matcher.group(1));
-                }
-                
-                // Fallback to regular total
-                String totalPattern = "\"total\"\\s*:\\s*(\\d+\\.?\\d*)";
-                pattern = java.util.regex.Pattern.compile(totalPattern);
-                matcher = pattern.matcher(json);
-                
-                if (matcher.find()) {
-                    return Double.parseDouble(matcher.group(1));
-                }
-                
-                return 0.0;
-            } catch (Exception e) {
-                return 0.0;
-            }
+                p = java.util.regex.Pattern.compile("\"total\"\\s*:\\s*(\\d+\\.?\\d*)");
+                m = p.matcher(json);
+                if (m.find()) return Double.parseDouble(m.group(1));
+            } catch (Exception e) {}
+            return 0.0;
         }
         
-        /**
-         * Extract promo code from JSON
-         */
-        private String extractPromoCodeFromJSON(String json) {
+        private String extractPromo(String json) {
             try {
-                String promoPattern = "\"promoCode\"\\s*:\\s*\"([^\"]+)\"";
-                java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(promoPattern);
-                java.util.regex.Matcher matcher = pattern.matcher(json);
-                
-                if (matcher.find()) {
-                    return matcher.group(1);
-                }
-                return null;
-            } catch (Exception e) {
-                return null;
-            }
+                java.util.regex.Pattern p = java.util.regex.Pattern.compile("\"promoCode\"\\s*:\\s*\"([^\"]+)\"");
+                java.util.regex.Matcher m = p.matcher(json);
+                if (m.find()) return m.group(1);
+            } catch (Exception e) {}
+            return null;
         }
     }
     
-    /**
-     * Handler for orders retrieval endpoint
-     * GET /api/orders
-     */
     static class OrdersHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
@@ -190,77 +151,175 @@ public class ShopItServer {
                 return;
             }
             
-            if (!"GET".equals(exchange.getRequestMethod())) {
-                sendResponse(exchange, 405, "{\"error\": \"Method not allowed\"}");
+            String path = exchange.getRequestURI().getPath();
+            String method = exchange.getRequestMethod();
+            
+            // Handle DELETE /api/orders/{id}
+            if (method.equals("DELETE") && path.matches("/api/orders/\\d+")) {
+                handleDeleteOrder(exchange, path);
                 return;
             }
             
+            // Handle POST /api/orders/{id}/cancel
+            if (method.equals("POST") && path.matches("/api/orders/\\d+/cancel")) {
+                handleCancelOrder(exchange, path);
+                return;
+            }
+            
+            // Handle GET /api/orders
+            if (method.equals("GET") && path.equals("/api/orders")) {
+                handleGetOrders(exchange);
+                return;
+            }
+            
+            sendResponse(exchange, 405, "{\"error\":\"Method not allowed\"}");
+        }
+        
+        private void handleGetOrders(HttpExchange exchange) throws IOException {
             try {
-                List<String> orders = getAllOrders();
+                List<String> orders = getOrders();
                 StringBuilder json = new StringBuilder("[");
                 for (int i = 0; i < orders.size(); i++) {
                     if (i > 0) json.append(",");
                     json.append(orders.get(i));
                 }
                 json.append("]");
+                
                 sendResponse(exchange, 200, json.toString());
+                System.out.println("✓ Retrieved " + orders.size() + " orders");
+                
             } catch (Exception e) {
-                System.err.println("✗ Orders retrieval error: " + e.getMessage());
-                sendResponse(exchange, 500, "{\"error\": \"Failed to retrieve orders\"}");
+                System.err.println("✗ Orders error: " + e.getMessage());
+                e.printStackTrace();
+                sendResponse(exchange, 500, "{\"error\":\"" + e.getMessage() + "\"}");
             }
         }
         
-        /**
-         * Get all orders from database using JDBC
-         */
-        private List<String> getAllOrders() throws SQLException {
-            List<String> orders = new ArrayList<>();
-            String selectSQL = "SELECT id, order_data, total_amount, promo_code, created_at FROM orders ORDER BY created_at DESC";
+        private void handleCancelOrder(HttpExchange exchange, String path) throws IOException {
+            try {
+                String[] parts = path.split("/");
+                int orderId = Integer.parseInt(parts[3]);
+                
+                boolean success = cancelOrder(orderId);
+                
+                if (success) {
+                    String response = String.format(
+                        "{\"success\":true,\"orderId\":%d,\"message\":\"Order cancelled successfully\"}",
+                        orderId
+                    );
+                    sendResponse(exchange, 200, response);
+                    System.out.println("✓ Order " + orderId + " cancelled");
+                } else {
+                    sendResponse(exchange, 404, "{\"error\":\"Order not found or already cancelled\"}");
+                }
+                
+            } catch (Exception e) {
+                System.err.println("✗ Cancel error: " + e.getMessage());
+                e.printStackTrace();
+                sendResponse(exchange, 500, "{\"error\":\"" + e.getMessage() + "\"}");
+            }
+        }
+        
+        private void handleDeleteOrder(HttpExchange exchange, String path) throws IOException {
+            try {
+                String[] parts = path.split("/");
+                int orderId = Integer.parseInt(parts[3]);
+                
+                boolean success = deleteOrder(orderId);
+                
+                if (success) {
+                    String response = String.format(
+                        "{\"success\":true,\"orderId\":%d,\"message\":\"Order deleted successfully\"}",
+                        orderId
+                    );
+                    sendResponse(exchange, 200, response);
+                    System.out.println("✓ Order " + orderId + " deleted");
+                } else {
+                    sendResponse(exchange, 404, "{\"error\":\"Order not found\"}");
+                }
+                
+            } catch (Exception e) {
+                System.err.println("✗ Delete error: " + e.getMessage());
+                e.printStackTrace();
+                sendResponse(exchange, 500, "{\"error\":\"" + e.getMessage() + "\"}");
+            }
+        }
+        
+        private boolean cancelOrder(int orderId) throws SQLException {
+            String sql = "UPDATE orders SET status = 'cancelled' WHERE id = ? AND status = 'active'";
+            
+            try (Connection conn = DriverManager.getConnection(DB_URL);
+                 PreparedStatement ps = conn.prepareStatement(sql)) {
+                
+                ps.setInt(1, orderId);
+                int updated = ps.executeUpdate();
+                return updated > 0;
+            }
+        }
+        
+        private boolean deleteOrder(int orderId) throws SQLException {
+            String sql = "DELETE FROM orders WHERE id = ? AND status = 'cancelled'";
+            
+            try (Connection conn = DriverManager.getConnection(DB_URL);
+                 PreparedStatement ps = conn.prepareStatement(sql)) {
+                
+                ps.setInt(1, orderId);
+                int deleted = ps.executeUpdate();
+                return deleted > 0;
+            }
+        }
+        
+        private List<String> getOrders() throws SQLException {
+            List<String> list = new ArrayList<>();
+            String sql = "SELECT id, order_data, total_amount, promo_code, status, created_at " +
+                        "FROM orders ORDER BY created_at DESC";
             
             try (Connection conn = DriverManager.getConnection(DB_URL);
                  Statement stmt = conn.createStatement();
-                 ResultSet rs = stmt.executeQuery(selectSQL)) {
+                 ResultSet rs = stmt.executeQuery(sql)) {
                 
                 while (rs.next()) {
-                    String promoCode = rs.getString("promo_code");
-                    String orderJson = String.format(
-                        "{\"id\": %d, \"data\": %s, \"total\": %.2f, \"promoCode\": %s, \"createdAt\": \"%s\"}",
+                    String promo = rs.getString("promo_code");
+                    String status = rs.getString("status");
+                    String item = String.format(
+                        "{\"id\":%d,\"data\":%s,\"total\":%.2f,\"promoCode\":%s,\"status\":\"%s\",\"createdAt\":\"%s\"}",
                         rs.getInt("id"),
                         rs.getString("order_data"),
                         rs.getDouble("total_amount"),
-                        promoCode != null ? "\"" + promoCode + "\"" : "null",
+                        promo != null ? "\"" + promo + "\"" : "null",
+                        status != null ? status : "active",
                         rs.getString("created_at")
                     );
-                    orders.add(orderJson);
+                    list.add(item);
                 }
             }
-            return orders;
+            return list;
         }
     }
     
     // Helper methods
-    private static String readRequestBody(HttpExchange exchange) throws IOException {
+    private static String readBody(HttpExchange exchange) throws IOException {
+        StringBuilder sb = new StringBuilder();
         try (BufferedReader br = new BufferedReader(
                 new InputStreamReader(exchange.getRequestBody(), "UTF-8"))) {
-            StringBuilder body = new StringBuilder();
             String line;
             while ((line = br.readLine()) != null) {
-                body.append(line);
+                sb.append(line);
             }
-            return body.toString();
         }
+        return sb.toString();
     }
     
     private static void addCORSHeaders(HttpExchange exchange) {
         exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
-        exchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-        exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type");
+        exchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
+        exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type, Authorization");
+        exchange.getResponseHeaders().add("Access-Control-Max-Age", "3600");
     }
     
-    private static void sendResponse(HttpExchange exchange, int code, String response) 
-            throws IOException {
+    private static void sendResponse(HttpExchange exchange, int code, String resp) throws IOException {
         exchange.getResponseHeaders().set("Content-Type", "application/json");
-        byte[] bytes = response.getBytes("UTF-8");
+        byte[] bytes = resp.getBytes("UTF-8");
         exchange.sendResponseHeaders(code, bytes.length);
         try (OutputStream os = exchange.getResponseBody()) {
             os.write(bytes);
